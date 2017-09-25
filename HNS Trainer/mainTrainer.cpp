@@ -104,8 +104,8 @@ int _tmain(int argc, _TCHAR* argv[])
 					DWORD oldProt;
 					BYTE HPvalue = 0x0C; // 12
 					oldProt = protectMemory<DWORD>(gameProcesshdl, LPVOID(addressHP), PAGE_READWRITE);
-					WriteProcessMemory(gameProcesshdl, LPVOID(addressHP), LPCVOID(HPvalue), sizeof(HPvalue), NULL);
-					cout <<endl <<  GetLastError() << endl;
+					WriteProcessMemory(gameProcesshdl, LPVOID(addressHP), LPCVOID(&HPvalue), sizeof(HPvalue), NULL);
+					
 					protectMemory<DWORD>(gameProcesshdl, LPVOID(addressHP), oldProt);
 					gameTime = clock();
 				}
