@@ -164,53 +164,6 @@ DWORD_PTR dwGetModuleBaseAddress(DWORD dwProcID, TCHAR *szModuleName)
 
 
 
-HANDLE getThread0Handle(DWORD processID){
-	HANDLE hThreadSnap = INVALID_HANDLE_VALUE;
-	THREADENTRY32 te32;
-	HANDLE hThread = INVALID_HANDLE_VALUE;
-	BOOL threadFound = false;
-
-	// Take a snapshot of all running threads  
-	hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (hThreadSnap == INVALID_HANDLE_VALUE)
-		return(FALSE);
-
-	// Fill in the size of the structure before using it. 
-	te32.dwSize = sizeof(THREADENTRY32);
-
-	// Retrieve information about the first thread,
-	// and exit if unsuccessful
-	if (!Thread32First(hThreadSnap, &te32))
-	{
-		CloseHandle(hThreadSnap);     // Must clean up the snapshot object!
-		return(FALSE);
-	}
-
-	do
-	{
-		if (te32.th32OwnerProcessID == processID)
-		{
-			_tprintf(TEXT("\n     THREAD ID      = 0x%08X"), te32.th32ThreadID);
-			_tprintf(TEXT("\n     base priority  = %d"), te32.tpBasePri);
-			_tprintf(TEXT("\n     delta priority = %d"), te32.tpDeltaPri);
-			threadFound = true;
-			break;
-		}
-	} while (Thread32Next(hThreadSnap, &te32));
-
-	_tprintf(TEXT("\n"));
-
-	//  Don't forget to clean up the snapshot object.
-	CloseHandle(hThreadSnap);
-
-	if (threadFound) {
-		hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID);
-	}
-
-	return hThread;
-
-}
-
 DWORD findAddressWithPointers(HANDLE hProc, int PointerLevel, DWORD BaseAddress, DWORD offsets[]){
 	DWORD baseAddress = BaseAddress;
 	DWORD tempPointer=baseAddress;
