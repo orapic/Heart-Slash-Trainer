@@ -3,14 +3,14 @@
 
 using namespace std;
 
-class SignatureScanner
+class ProcessAnalyser
 {
 public:
 	//Default Constructor
-	SignatureScanner();
+	ProcessAnalyser();
 	//Overload 
-	SignatureScanner(string processName);
-	~SignatureScanner();
+	ProcessAnalyser(string processName);
+	~ProcessAnalyser();
 	
 	// Consigue un Handle del proceso y su PID
 	HANDLE getProcessHandleAndPID();

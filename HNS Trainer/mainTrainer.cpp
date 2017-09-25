@@ -1,10 +1,6 @@
 #include "stdafx.h"
 
-
-#define F1Key 0x70
-
 using namespace std;
-
 
 // Detectar si un programa está en ejecucion
 DWORD getProcessEntry(string processName, PROCESSENTRY32& pentry);
@@ -50,66 +46,66 @@ int _tmain(int argc, _TCHAR* argv[])
 	processName = "HeartnSlash64.exe";
 
 	// Esta clase consigue información sobre el programa pid, size etc
-	SignatureScanner sigscan = SignatureScanner(processName);
+	ProcessAnalyser procanalyser = ProcessAnalyser(processName);
 
-	wcout << "--------Heart&Slash TRAINER PLEB VERSION--------" << endl;
+	wcout << "--------Heart&Slash EXTERNAL TRAINER--------" << endl;
 
-	cout << "Comprobando si esta " << processName << " entre los procesos" << endl;
+	cout << "Checking if " << processName << " is running" << endl;
 
-	gameProcesshdl = sigscan.getProcessHandleAndPID();
+	gameProcesshdl = procanalyser.getProcessHandleAndPID();
 	
 
 	if (gameProcesshdl != INVALID_HANDLE_VALUE || gameProcesshdl == NULL) {
-		if (sigscan.getIs64()) {
+		if (procanalyser.getIs64()) {
 			cout << "The process is a 64 Process" << endl;
 		}
 		else cout << "The process is a 32 Process" << endl;
 
-		PID = sigscan.getPID();
+		PID = procanalyser.getPID();
 
-		cout << "se ha econtrado " << processName << ", con PID : " << PID << endl;
+		cout << "Process: " << processName << " found! PID : " << PID << endl;
 
-		if (!sigscan.findModule64Info("HeartnSlash64.exe")) {
+		if (!procanalyser.findModule64Info("HeartnSlash64.exe")) {
 			cout << "ERROR: findModule64Info failed" << endl;
 			return 1;
 		}
 
-		DWORD_PTR moduleBaseAddress = sigscan.getModule64BaseAddress();
-		DWORD moduleSize = sigscan.getSizeofModule();
+		DWORD_PTR moduleBaseAddress = procanalyser.getModule64BaseAddress();
+		DWORD moduleSize = procanalyser.getSizeofModule();
 
 
-		wcout << "El proceso se ha cargado en la direccion : " << hex <<  moduleBaseAddress << endl;
-		wcout << "Infinite HP" << endl;
+		wcout << "Process loaded at address : " << hex <<  moduleBaseAddress << endl;
+		wcout << "Infinite HP Cheat" << endl;
 
 		// Calculando la direccion de la HP
 
 		if (moduleBaseAddress != 0) {
 			DWORD offsets[] = {0x3E8, 0x448, 0x244};
 			
-			
 			DWORD_PTR addressMEH = moduleBaseAddress + 0x012BFDE8;
+
 			//Its weird cause the first address is 8 bytes but then its 4 bytes
 			// for the next addresses and values.
 			DWORD addressfirstPointer;
 			addressfirstPointer = readMemory<DWORD>(gameProcesshdl, LPVOID(addressMEH));
 			DWORD addressHP = findAddressWithPointers(gameProcesshdl, 3, addressfirstPointer, offsets);
-			
+
+			/* // DEBUG
 			wcout << "Address of HP: ";
 			wcout << hex << addressHP << endl;
+			 */
+
 			int gameTime = clock();
 			// LOOP
 			while (1) {
 				if (clock() - gameTime > 100) {
-					cout << "Writing to the HP address" << '\r';
 					DWORD oldProt;
 					BYTE HPvalue = 0x0C; // 12
 					oldProt = protectMemory<DWORD>(gameProcesshdl, LPVOID(addressHP), PAGE_READWRITE);
-					WriteProcessMemory(gameProcesshdl, LPVOID(addressHP), LPCVOID(&HPvalue), sizeof(HPvalue), NULL);
-					
+					WriteProcessMemory(gameProcesshdl, LPVOID(addressHP), LPCVOID(&HPvalue), sizeof(HPvalue), NULL);		
 					protectMemory<DWORD>(gameProcesshdl, LPVOID(addressHP), oldProt);
 					gameTime = clock();
 				}
-
 
 			}
 
@@ -117,9 +113,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			CloseHandle(gameProcesshdl);
 			return 0;
 
-
 		}
-
 
 	}
 	else{
@@ -134,7 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-//Get the base address of the loaded module
+//Get the base address of the loaded module *TEST*
 DWORD_PTR dwGetModuleBaseAddress(DWORD dwProcID, TCHAR *szModuleName)
 {
 	DWORD_PTR dwModuleBaseAddress = 0;

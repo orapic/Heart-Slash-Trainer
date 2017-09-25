@@ -15,7 +15,7 @@
 #include <Psapi.h>
 #include <iostream>
 #include <ctime>
-#include "SignatureScanner.h"
+#include "ProcessAnalyser.h"
 
 
 // TODO: mencionar aquí los encabezados adicionales que el programa necesita

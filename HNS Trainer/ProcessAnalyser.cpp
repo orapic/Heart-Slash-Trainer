@@ -1,46 +1,47 @@
-#include "SignatureScanner.h"
+#include "ProcessAnalyser.h"
 
 
 using namespace std;
 
-SignatureScanner::SignatureScanner()
+ProcessAnalyser::ProcessAnalyser()
 {
 }
 
-SignatureScanner::SignatureScanner(string processName){
+ProcessAnalyser::ProcessAnalyser(string processName){
 	ProcessName = processName;
 	Is64 = false;
 }
 
-SignatureScanner::~SignatureScanner()
+ProcessAnalyser::~ProcessAnalyser()
 {
 }
 
-DWORD SignatureScanner::getPID(){
+DWORD ProcessAnalyser::getPID(){
 	return PID;
 }
 
-string SignatureScanner::getProcessName(){
+string ProcessAnalyser::getProcessName(){
 	return ProcessName;
 }
 
-DWORD SignatureScanner::getSizeofModule(){
+DWORD ProcessAnalyser::getSizeofModule(){
 	return SizeofModule;
 }
 
-DWORD SignatureScanner::getModuleBaseAddress(){
+DWORD ProcessAnalyser::getModuleBaseAddress(){
 	return ModuleBaseAddress;
 }
 
-BOOLEAN SignatureScanner::getIs64(){
+BOOLEAN ProcessAnalyser::getIs64(){
 	return Is64;
 }
 
-DWORD_PTR SignatureScanner::getModule64BaseAddress(){
+DWORD_PTR ProcessAnalyser::getModule64BaseAddress(){
 	return Module64BaseAddress;
 }
 
-BOOLEAN SignatureScanner::findModuleInfo(string moduleName) {
+// Get the 32 bit module of the process
+BOOLEAN ProcessAnalyser::findModuleInfo(string moduleName) {
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	MODULEENTRY32 me32;
 	//wstring moduleNametemp = wstring(moduleName.begin(), moduleName.end());
@@ -79,7 +80,8 @@ BOOLEAN SignatureScanner::findModuleInfo(string moduleName) {
 
 }
 
-BOOLEAN SignatureScanner::findModule64Info(string moduleName) {
+// Get the 64 bit module of the process
+BOOLEAN ProcessAnalyser::findModule64Info(string moduleName) {
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	MODULEENTRY32 me32;
 
@@ -107,9 +109,11 @@ BOOLEAN SignatureScanner::findModule64Info(string moduleName) {
 			//Need to use a DWORD_PTR for a 64 bit module
 			Module64BaseAddress = (DWORD_PTR)me32.modBaseAddr;
 			SizeofModule = me32.modBaseSize;
-			wcout << "Encontrada la handle del module: " << me32.hModule << endl;
-			cout << "Dirección del module: " << std::hex << Module64BaseAddress << endl;
-			cout << "Tamaño del module: " << std::hex << SizeofModule << endl;
+			/*  DEBUG 
+			cout << "Encontrada la handle del module: " << me32.hModule << endl;
+			cout << "Address of the module: " << std::hex << Module64BaseAddress << endl;
+			cout << "Size of the module: " << std::hex << SizeofModule << endl;
+			// */
 			return true;
 		}
 	} while (Module32Next(hModuleSnap, &me32));
@@ -118,8 +122,8 @@ BOOLEAN SignatureScanner::findModule64Info(string moduleName) {
 
 }
 
-
-HANDLE SignatureScanner::getProcessHandleAndPID(){
+// Gets the handle and the pid of a process
+HANDLE ProcessAnalyser::getProcessHandleAndPID(){
 	HANDLE hProcessSnap;
 	PROCESSENTRY32 pentry;
 	pentry.dwSize = sizeof(PROCESSENTRY32);
